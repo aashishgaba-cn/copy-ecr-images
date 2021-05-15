@@ -5,10 +5,13 @@ phases:
     commands:
       - |
         echo "Pre Build: authenticate to target ECR"
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   build:
     commands:
       - |
         echo "Build: Hello, CodeBuild!"
+        docker images
   post_build:
     commands:
       - echo "Post:post_build phase"
