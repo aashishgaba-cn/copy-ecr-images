@@ -16,6 +16,7 @@ env:
     SOURCE_AWS_SESSION_TOKEN: agaba-cn-ecr-user:$SOURCE_AWS_ACCOUNT_ID-session-token
     TARGET_AWS_ACCESS_KEY_ID: agaba-cn-ecr-user:$TARGET_AWS_ACCOUNT_ID-access-key
     TARGET_AWS_SECRET_ACCESS_KEY: agaba-cn-ecr-user:$TARGET_AWS_ACCOUNT_ID-secret
+    TARGET_AWS_SESSION_TOKEN: agaba-cn-ecr-user:$TARGET_AWS_ACCOUNT_ID-session-token
 
 phases:
   pre_build:
@@ -37,6 +38,7 @@ phases:
       - aws configure --profile target-ecr set output "json"
       - aws configure --profile target-ecr set aws_secret_access_key $TARGET_AWS_SECRET_ACCESS_KEY
       - aws configure --profile target-ecr set aws_access_key_id $TARGET_AWS_ACCESS_KEY_ID
+      - aws configure --profile target-ecr set aws_session_token $TARGET_AWS_SESSION_TOKEN
   build:
     commands:
       - echo Logging in to Source Amazon ECR...
