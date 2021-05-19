@@ -32,13 +32,13 @@ phases:
       - aws configure --profile source-ecr set output "json"
       - aws configure --profile source-ecr set aws_secret_access_key $SOURCE_AWS_SECRET_ACCESS_KEY
       - aws configure --profile source-ecr set aws_access_key_id $SOURCE_AWS_ACCESS_KEY_ID
-      - aws configure --profile source-ecr set aws_session_token $SOURCE_AWS_SESSION_TOKEN
+      - if [ $SOURCE_AWS_SESSION_TOKEN != "" ]; then aws configure --profile source-ecr set aws_session_token $SOURCE_AWS_SESSION_TOKEN; fi
       - echo Setting up target aws profile
       - aws configure --profile target-ecr set region $TARGET_AWS_REGION
       - aws configure --profile target-ecr set output "json"
       - aws configure --profile target-ecr set aws_secret_access_key $TARGET_AWS_SECRET_ACCESS_KEY
       - aws configure --profile target-ecr set aws_access_key_id $TARGET_AWS_ACCESS_KEY_ID
-      - aws configure --profile target-ecr set aws_session_token $TARGET_AWS_SESSION_TOKEN
+      - if [ $TARGET_AWS_SESSION_TOKEN != "" ]; then aws configure --profile target-ecr set aws_session_token $TARGET_AWS_SESSION_TOKEN; fi
   build:
     commands:
       - echo Logging in to Source Amazon ECR...
