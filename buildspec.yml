@@ -9,11 +9,11 @@ env:
     IMAGE_NAME: "agaba"
     IMAGE_TAG: "latest"
   secrets-manager:
-    SOURCE_AWS_ACCESS_KEY_ID: "agaba-cn-ecr-user:source-access-key"
-    SOURCE_AWS_SECRET_ACCESS_KEY: "agaba-cn-ecr-user:source-secret"
-    SOURCE_AWS_SESSION_TOKEN: "agaba-cn-ecr-user:source-session-token"
-    TARGET_AWS_ACCESS_KEY_ID: "agaba-cn-ecr-user:target-access-key"
-    TARGET_AWS_SECRET_ACCESS_KEY: "agaba-cn-ecr-user:target-secret"
+    SOURCE_AWS_ACCESS_KEY_ID: agaba-cn-ecr-user:$SOURCE_AWS_ACCOUNT_ID-access-key
+    SOURCE_AWS_SECRET_ACCESS_KEY: agaba-cn-ecr-user:$SOURCE_AWS_ACCOUNT_ID-secret
+    SOURCE_AWS_SESSION_TOKEN: agaba-cn-ecr-user:$SOURCE_AWS_ACCOUNT_ID-session-token
+    TARGET_AWS_ACCESS_KEY_ID: agaba-cn-ecr-user:$TARGET_AWS_ACCOUNT_ID-access-key
+    TARGET_AWS_SECRET_ACCESS_KEY: agaba-cn-ecr-user:$TARGET_AWS_ACCOUNT_ID-secret
 
 phases:
   pre_build:
