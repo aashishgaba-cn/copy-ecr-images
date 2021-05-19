@@ -6,8 +6,10 @@ env:
     TARGET_AWS_ACCOUNT_ID: "346945241475"
     SOURCE_AWS_REGION: "us-east-1"
     TARGET_AWS_REGION: "us-east-1"
-    IMAGE_NAME: "agaba"
-    IMAGE_TAG: "latest"
+    SOURCE_IMAGE_NAME: "agaba"
+    SOURCE_IMAGE_TAG: "latest"
+    TARGET_IMAGE_NAME: "agaba"
+    TARGET_IMAGE_TAG: "latest"
   secrets-manager:
     SOURCE_AWS_ACCESS_KEY_ID: agaba-cn-ecr-user:$SOURCE_AWS_ACCOUNT_ID-access-key
     SOURCE_AWS_SECRET_ACCESS_KEY: agaba-cn-ecr-user:$SOURCE_AWS_ACCOUNT_ID-secret
@@ -18,13 +20,15 @@ env:
 phases:
   pre_build:
     commands:
-      - echo Setting up source profile
+      - echo source account is $SOURCE_AWS_ACCOUNT_ID
+      - echo target account is $TARGET_AWS_ACCOUNT_ID
+      - echo Setting up source aws profile
       - aws configure --profile source-ecr set region $SOURCE_AWS_REGION
       - aws configure --profile source-ecr set output "json"
       - aws configure --profile source-ecr set aws_secret_access_key $SOURCE_AWS_SECRET_ACCESS_KEY
       - aws configure --profile source-ecr set aws_access_key_id $SOURCE_AWS_ACCESS_KEY_ID
       - aws configure --profile source-ecr set aws_session_token $SOURCE_AWS_SESSION_TOKEN
-      - echo Setting up target profile
+      - echo Setting up target aws profile
       - aws configure --profile target-ecr set region $TARGET_AWS_REGION
       - aws configure --profile target-ecr set output "json"
       - aws configure --profile target-ecr set aws_secret_access_key $TARGET_AWS_SECRET_ACCESS_KEY
@@ -35,14 +39,14 @@ phases:
       - aws --profile source-ecr ecr get-login-password | docker login --username AWS --password-stdin $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.$SOURCE_AWS_REGION.amazonaws.com
       - echo successfully logged in to source ecr
       - echo Starting to pull source image from ECR
-      - docker pull $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$IMAGE_NAME:$IMAGE_TAG
+      - docker pull $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$SOURCE_IMAGE_NAME:$SOURCE_IMAGE_TAG
       - echo Logging in to Target Amazon ECR....
       - aws --profile target-ecr ecr get-login-password | docker login --username AWS --password-stdin $TARGET_AWS_ACCOUNT_ID.dkr.ecr.$TARGET_AWS_REGION.amazonaws.com
       - echo successfully logged in to target ecr
       - echo Tagging the pulled image in accordance with the new target
-      - docker tag $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$IMAGE_NAME:$IMAGE_TAG $TARGET_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$IMAGE_NAME:$IMAGE_TAG
+      - docker tag $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$SOURCE_IMAGE_NAME:$SOURCE_IMAGE_TAG $TARGET_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$TARGET_IMAGE_NAME:$TARGET_IMAGE_TAG
       - echo Starting to push to Target ECR
-      - docker push $TARGET_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$IMAGE_NAME:$IMAGE_TAG
+      - docker push $TARGET_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$TARGET_IMAGE_NAME:$TARGET_IMAGE_TAG
 
   post_build:
     commands:
