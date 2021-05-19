@@ -3,11 +3,16 @@ version: 0.2
 env:
   variables:
     SOURCE_AWS_ACCOUNT_ID: "082830052325"
+    TARGET_AWS_ACCOUNT_ID: "346945241475"
     SOURCE_AWS_REGION: "us-east-1"
+    TARGET_AWS_REGION: "us-east-1"
   secrets-manager:
-    SOURCE_AWS_ACCESS_KEY_ID: "agaba-cn-ecr-user:access-key"
-    SOURCE_AWS_SECRET_ACCESS_KEY: "agaba-cn-ecr-user:secret"
-    SOURCE_AWS_SESSION_TOKEN: "agaba-cn-ecr-user:session-token"
+    SOURCE_AWS_ACCESS_KEY_ID: "agaba-cn-ecr-user:source-access-key"
+    SOURCE_AWS_SECRET_ACCESS_KEY: "agaba-cn-ecr-user:source-secret"
+    SOURCE_AWS_SESSION_TOKEN: "agaba-cn-ecr-user:source-session-token"
+    TARGET_AWS_ACCESS_KEY_ID: "agaba-cn-ecr-user:target-access-key"
+    TARGET_AWS_SECRET_ACCESS_KEY: "agaba-cn-ecr-user:target-secret"
+
 phases:
   pre_build:
     commands:
@@ -17,13 +22,24 @@ phases:
       - aws configure --profile source-ecr set aws_secret_access_key $SOURCE_AWS_SECRET_ACCESS_KEY
       - aws configure --profile source-ecr set aws_access_key_id $SOURCE_AWS_ACCESS_KEY_ID
       - aws configure --profile source-ecr set aws_session_token $SOURCE_AWS_SESSION_TOKEN
-      - echo Logging in to Amazon ECR...
-      - aws --profile source-ecr ecr get-login-password | docker login --username AWS --password-stdin $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.$SOURCE_AWS_REGION.amazonaws.com
-      - echo successfully logged in to source ecr
+      - echo Setting up target profile
+      - aws configure --profile target-ecr set region $TARGET_AWS_REGION
+      - aws configure --profile target-ecr set output "json"
+      - aws configure --profile target-ecr set aws_secret_access_key $TARGET_AWS_SECRET_ACCESS_KEY
+      - aws configure --profile target-ecr set aws_access_key_id $TARGET_AWS_ACCESS_KEY_ID
   build:
     commands:
-      - echo In build stage
-      - docker images
+      - echo Logging in to Source Amazon ECR...
+      - aws --profile source-ecr ecr get-login-password | docker login --username AWS --password-stdin $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.$SOURCE_AWS_REGION.amazonaws.com
+      - echo successfully logged in to source ecr
+      - echo Starting to pull source image from ECR
+      - docker pull $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/agaba:latest
+      - echo Logging in to Target Amazon ECR....
+      - aws --profile source-ecr ecr get-login-password | docker login --username AWS --password-stdin $TARGET_AWS_ACCOUNT_ID.dkr.ecr.$TARGET_AWS_REGION.amazonaws.com
+      - echo successfully logged in to target ecr
+      - echo Starting to push to Target ECR
+      - docker pull $TARGET_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/agaba:latest
+
   post_build:
     commands:
       - echo "Post:post_build phase"
