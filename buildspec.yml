@@ -20,8 +20,8 @@ env:
 phases:
   pre_build:
     commands:
-      - echo source account is ${SOURCE_AWS_ACCOUNT_ID}
-      - echo target account is ${TARGET_AWS_ACCOUNT_ID}
+      - echo source account is $SOURCE_AWS_ACCOUNT_ID
+      - echo target account is $TARGET_AWS_ACCOUNT_ID
       - echo Setting up source aws profile
       - aws configure --profile source-ecr set region $SOURCE_AWS_REGION
       - aws configure --profile source-ecr set output "json"
