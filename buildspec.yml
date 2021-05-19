@@ -35,10 +35,10 @@ phases:
       - echo Starting to pull source image from ECR
       - docker pull $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/agaba:latest
       - echo Logging in to Target Amazon ECR....
-      - aws --profile source-ecr ecr get-login-password | docker login --username AWS --password-stdin $TARGET_AWS_ACCOUNT_ID.dkr.ecr.$TARGET_AWS_REGION.amazonaws.com
+      - aws --profile target-ecr ecr get-login-password | docker login --username AWS --password-stdin $TARGET_AWS_ACCOUNT_ID.dkr.ecr.$TARGET_AWS_REGION.amazonaws.com
       - echo successfully logged in to target ecr
       - echo Starting to push to Target ECR
-      - docker pull $TARGET_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/agaba:latest
+      - docker push $TARGET_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/agaba:latest
 
   post_build:
     commands:
