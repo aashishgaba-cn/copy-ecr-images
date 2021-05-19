@@ -6,9 +6,9 @@ env:
     TARGET_AWS_ACCOUNT_ID: "346945241475"
     SOURCE_AWS_REGION: "us-east-1"
     TARGET_AWS_REGION: "us-east-1"
-    SOURCE_IMAGE_NAME: "agaba"
+    SOURCE_REPO: "agaba"
     SOURCE_IMAGE_TAG: "latest"
-    TARGET_IMAGE_NAME: "agaba"
+    TARGET_REPO: "agaba"
     TARGET_IMAGE_TAG: "latest"
   secrets-manager:
     SOURCE_AWS_ACCESS_KEY_ID: agaba-cn-ecr-user:$SOURCE_AWS_ACCOUNT_ID-access-key
@@ -21,7 +21,11 @@ phases:
   pre_build:
     commands:
       - echo source account is $SOURCE_AWS_ACCOUNT_ID
+      - echo source Repo is $SOURCE_REPO
+      - echo source Image tag is $SOURCE_IMAGE_TAG
       - echo target account is $TARGET_AWS_ACCOUNT_ID
+      - echo target Repo is $TARGET_REPO
+      - echo target Image tag is $TARGET_IMAGE_TAG
       - echo Setting up source aws profile
       - aws configure --profile source-ecr set region $SOURCE_AWS_REGION
       - aws configure --profile source-ecr set output "json"
@@ -39,14 +43,14 @@ phases:
       - aws --profile source-ecr ecr get-login-password | docker login --username AWS --password-stdin $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.$SOURCE_AWS_REGION.amazonaws.com
       - echo successfully logged in to source ecr
       - echo Starting to pull source image from ECR
-      - docker pull $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$SOURCE_IMAGE_NAME:$SOURCE_IMAGE_TAG
+      - docker pull $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$SOURCE_REPO:$SOURCE_IMAGE_TAG
       - echo Logging in to Target Amazon ECR....
       - aws --profile target-ecr ecr get-login-password | docker login --username AWS --password-stdin $TARGET_AWS_ACCOUNT_ID.dkr.ecr.$TARGET_AWS_REGION.amazonaws.com
       - echo successfully logged in to target ecr
       - echo Tagging the pulled image in accordance with the new target
-      - docker tag $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$SOURCE_IMAGE_NAME:$SOURCE_IMAGE_TAG $TARGET_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$TARGET_IMAGE_NAME:$TARGET_IMAGE_TAG
+      - docker tag $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$SOURCE_REPO:$SOURCE_IMAGE_TAG $TARGET_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$TARGET_REPO:$TARGET_IMAGE_TAG
       - echo Starting to push to Target ECR
-      - docker push $TARGET_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$TARGET_IMAGE_NAME:$TARGET_IMAGE_TAG
+      - docker push $TARGET_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$TARGET_REPO:$TARGET_IMAGE_TAG
 
   post_build:
     commands:
