@@ -6,6 +6,8 @@ env:
     TARGET_AWS_ACCOUNT_ID: "346945241475"
     SOURCE_AWS_REGION: "us-east-1"
     TARGET_AWS_REGION: "us-east-1"
+    IMAGE_NAME: "agaba"
+    IMAGE_TAG: "latest"
   secrets-manager:
     SOURCE_AWS_ACCESS_KEY_ID: "agaba-cn-ecr-user:source-access-key"
     SOURCE_AWS_SECRET_ACCESS_KEY: "agaba-cn-ecr-user:source-secret"
@@ -33,12 +35,14 @@ phases:
       - aws --profile source-ecr ecr get-login-password | docker login --username AWS --password-stdin $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.$SOURCE_AWS_REGION.amazonaws.com
       - echo successfully logged in to source ecr
       - echo Starting to pull source image from ECR
-      - docker pull $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/agaba:latest
+      - docker pull $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$IMAGE_NAME:$IMAGE_TAG
       - echo Logging in to Target Amazon ECR....
       - aws --profile target-ecr ecr get-login-password | docker login --username AWS --password-stdin $TARGET_AWS_ACCOUNT_ID.dkr.ecr.$TARGET_AWS_REGION.amazonaws.com
       - echo successfully logged in to target ecr
+      - echo Tagging the pulled image in accordance with the new target
+      - docker tag $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$IMAGE_NAME:$IMAGE_TAG $TARGET_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$IMAGE_NAME:$IMAGE_TAG
       - echo Starting to push to Target ECR
-      - docker push $TARGET_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/agaba:latest
+      - docker push $TARGET_AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$IMAGE_NAME:$IMAGE_TAG
 
   post_build:
     commands:
