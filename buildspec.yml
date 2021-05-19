@@ -4,10 +4,6 @@ env:
   variables:
     SOURCE_AWS_ACCOUNT_ID: "082830052325"
     SOURCE_AWS_REGION: "us-east-1"
-  secrets-manager:
-    SOURCE_AWS_ACCESS_KEY_ID: arn:aws:secretsmanager:us-east-1:082830052325:secret:agaba-cn-ecr-user:access-key
-    SOURCE_AWS_SECRET_ACCESS_KEY: arn:aws:secretsmanager:us-east-1:082830052325:secret:agaba-cn-ecr-user:secret
-    SOURCE_AWS_SESSION_TOKEN: arn:aws:secretsmanager:us-east-1:082830052325:secret:agaba-cn-ecr-user:session-token
 
 phases:
   pre_build:
