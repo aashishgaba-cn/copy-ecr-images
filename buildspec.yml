@@ -18,13 +18,12 @@ phases:
       - aws configure --profile source-ecr set aws_secret_access_key "$SOURCE_AWS_SECRET_ACCESS_KEY"
       - aws configure --profile source-ecr set aws_access_key_id "$SOURCE_AWS_ACCESS_KEY_ID"
       - aws configure --profile source-ecr set aws_session_token "$SOURCE_AWS_SESSION_TOKEN"
-      - echo Pre Build: authenticate to target ECR
       - echo Logging in to Amazon ECR...
       - aws --profile source-ecr ecr get-login-password | docker login --username AWS --password-stdin $SOURCE_AWS_ACCOUNT_ID.dkr.ecr.$SOURCE_AWS_REGION.amazonaws.com
       - echo successfully logged in to source ecr
   build:
     commands:
-      - echo "Build: Hello, CodeBuild!"
+      - echo In build stage
       - docker images
   post_build:
     commands:
