@@ -43,10 +43,12 @@ phases:
       - if [ $SOURCE_AWS_SESSION_TOKEN != "" ]; then aws configure --profile source-ecr set aws_session_token $SOURCE_AWS_SESSION_TOKEN; fi
       - echo Successfully set up source AWS profile
       - echo Starting to set up target AWS profile
+      - echo $TARGET_AWS_REGION
       - aws configure --profile target-ecr set region $TARGET_AWS_REGION
-      - aws configure --profile target-ecr set output "json"
-      - aws configure --profile target-ecr set aws_secret_access_key $TARGET_AWS_SECRET_ACCESS_KEY
+      - echo $TARGET_AWS_ACCESS_KEY_ID
       - aws configure --profile target-ecr set aws_access_key_id $TARGET_AWS_ACCESS_KEY_ID
+      - aws configure --profile target-ecr set aws_secret_access_key $TARGET_AWS_SECRET_ACCESS_KEY
+      - aws configure --profile target-ecr set output "json"
       - if [ $TARGET_AWS_SESSION_TOKEN != "" ]; then aws configure --profile target-ecr set aws_session_token $TARGET_AWS_SESSION_TOKEN; fi
       - echo Successfully set up target AWS profile
   build:
