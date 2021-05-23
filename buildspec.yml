@@ -45,7 +45,7 @@ phases:
       - echo Successfully set up source AWS profile
       - echo Starting to set up target AWS profile
       - echo Need to get target AWS Creds from secret $TARGET_SECRET_NAME
-      - targetSecret=$(aws --profile --source-ecr secretsmanager get-secret-value --secret-id $TARGET_SECRET_NAME --query SecretString --output text)
+      - targetSecret=$(aws --profile source-ecr secretsmanager get-secret-value --secret-id $TARGET_SECRET_NAME --query SecretString --output text)
       - echo Successfully got the secret value
       - TARGET_AWS_ACCESS_KEY_ID=$(echo $targetSecret | jq --arg key $TARGET_SECRET_PATH_TO_ACCESS_KEY_ID '.[$key]')
       - TARGET_AWS_SECRET_ACCESS_KEY=$(echo $targetSecret | jq --arg key $TARGET_SECRET_PATH_TO_SECRET_ACCESS_KEY '.[$key]')
