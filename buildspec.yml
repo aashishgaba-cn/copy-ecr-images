@@ -12,17 +12,18 @@ env:
     TARGET_AWS_REGION: "us-east-1"
     TARGET_ECR_REPOSITORY: ""
     TARGET_IMAGE_TAG: "latest"
+    TARGET_SECRET_NAME: ""
     TARGET_SECRET_PATH_TO_ACCESS_KEY_ID: ""
     TARGET_SECRET_PATH_TO_SECRET_ACCESS_KEY: ""
     TARGET_SECRET_PATH_TO_SESSION_TOKEN: ""
-  secrets-manager:
+#   secrets-manager:
 # These are defined in the Project itself.
 #     SOURCE_AWS_ACCESS_KEY_ID: $SOURCE_SECRET_NAME:aws-access-key-id
 #     SOURCE_AWS_SECRET_ACCESS_KEY: $SOURCE_SECRET_NAME:aws-secret-access-key
 #     SOURCE_AWS_SESSION_TOKEN: $SOURCE_SECRET_NAME:aws-session-token
-    TARGET_AWS_ACCESS_KEY_ID: $TARGET_SECRET_PATH_TO_ACCESS_KEY_ID
-    TARGET_AWS_SECRET_ACCESS_KEY: $TARGET_SECRET_PATH_TO_SECRET_ACCESS_KEY
-    TARGET_AWS_SESSION_TOKEN: $TARGET_SECRET_PATH_TO_SESSION_TOKEN
+#     TARGET_AWS_ACCESS_KEY_ID: $TARGET_SECRET_PATH_TO_ACCESS_KEY_ID
+#     TARGET_AWS_SECRET_ACCESS_KEY: $TARGET_SECRET_PATH_TO_SECRET_ACCESS_KEY
+#     TARGET_AWS_SESSION_TOKEN: $TARGET_SECRET_PATH_TO_SESSION_TOKEN
 
 phases:
   pre_build:
@@ -43,6 +44,12 @@ phases:
       - if [ $SOURCE_AWS_SESSION_TOKEN != "" ]; then aws configure --profile source-ecr set aws_session_token $SOURCE_AWS_SESSION_TOKEN; fi
       - echo Successfully set up source AWS profile
       - echo Starting to set up target AWS profile
+      - echo Need to get target AWS Creds from secret $TARGET_SECRET_NAME
+      - targetSecret=$(aws --profile --source-ecr secretsmanager get-secret-value --secret-id $TARGET_SECRET_NAME --query SecretString --output text)
+      - echo Successfully got the secret value
+      - TARGET_AWS_ACCESS_KEY_ID=$(echo $targetSecret | jq --arg key $TARGET_SECRET_PATH_TO_ACCESS_KEY_ID '.[$key]')
+      - TARGET_AWS_SECRET_ACCESS_KEY=$(echo $targetSecret | jq --arg key $TARGET_SECRET_PATH_TO_SECRET_ACCESS_KEY '.[$key]')
+      - TARGET_AWS_SESSION_TOKEN=$(echo $targetSecret | jq --arg key $TARGET_SECRET_PATH_TO_SESSION_TOKEN '.[$key]')
       - echo $TARGET_AWS_REGION
       - aws configure --profile target-ecr set region $TARGET_AWS_REGION
       - echo $TARGET_AWS_ACCESS_KEY_ID
